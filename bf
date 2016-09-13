@@ -1,2 +1,2 @@
 #!/bin/bash
-tr -d '\n' | ./main.scm < /dev/stdin
+tr -d '\n' | ./main.scm $* < /dev/stdin

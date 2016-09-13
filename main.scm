@@ -2,10 +2,8 @@
 -e main -s
 !#
 
-(use-modules (ice-9 rdelim))
 
-; load instead of module to keep parser a
-; bit more portable between scheme versions
+(use-modules (ice-9 rdelim))
 (load "parser.scm")
 
 ; brainfuck program to be read through stdin

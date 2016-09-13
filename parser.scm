@@ -1,3 +1,8 @@
+;(define-module (brainfuck parser)
+;               #:use-module (ice-9 format)
+;               #:export (parse-string))
+(use-modules (ice-9 format))
+
 ; car with fallback 0
 (define (stack-take stack)
   (if (null? stack)
