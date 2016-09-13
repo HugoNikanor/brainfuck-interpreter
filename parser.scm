@@ -45,15 +45,29 @@
                    (set! right-stack (stack-rest right-stack)))
             ((#\.) (display (integer->char value)))
             ((#\,) (set! value (read-char)))
-            ((#\[) (let ((items (call/cc
-                                  (lambda (cont)
-                                    (set! jumpbacks (cons cont jumpbacks))
-                                    (cont (list value
-                                                left-stack
-                                                right-stack))))))
-                     (set! value (car items))
-                     (set! left-stack (cadr items))
-                     (set! right-stack (caddr items))))
+            ((#\[) (if (zero? value)
+                     ;; Remove items until matching end bracket is found
+                     (set! rem
+                       (let eat-rem ((rem rem)
+                                     (depth 0))
+                         (if (eqv? (car rem) #\])
+                           (if (zero? depth)
+                             (cdr rem)
+                             (eat-rem (cdr rem) (1- depth)))
+                           (eat-rem (cdr rem)
+                                    ((if (eqv? (car rem) #\[)
+                                       1+
+                                       +)
+                                     depth)))))
+                     (let ((items (call/cc
+                                    (lambda (cont)
+                                      (set! jumpbacks (cons cont jumpbacks))
+                                      (cont (list value
+                                                  left-stack
+                                                  right-stack))))))
+                       (set! value (car items))
+                       (set! left-stack (cadr items))
+                       (set! right-stack (caddr items)))))
             ((#\]) (if (not (zero? value))
                      ((car jumpbacks) (list value
                                             left-stack

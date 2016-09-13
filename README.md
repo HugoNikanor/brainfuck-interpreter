@@ -7,5 +7,4 @@ be possible to write out without to much trouble.
 	./bf < file.bf
 
 ## Issues
-+ Starting brackets (`[`) doesn't check if the current value is zero.
 
