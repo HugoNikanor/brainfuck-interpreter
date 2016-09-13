@@ -57,4 +57,5 @@
           (inner rem jumpbacks left-stack value right-stack)))))
   (inner code-list '() '() 0 '()))
 
-
+(define (parse-string str . args)
+  (parse (string->list str) (if (null? args) #f (car args))))
