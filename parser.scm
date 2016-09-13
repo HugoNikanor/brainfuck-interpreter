@@ -12,16 +12,17 @@
 
 
 ; code-list is the brainfuck code as a list of characters
-; put anything in args to enable debug output
+; an optional secound argument is a boolean if debug output should be on
 (define (parse code-list . args)
   (define (inner rem jumpbacks left-stack value right-stack)
     (unless (null? rem)
-      (when (not (null? args))
-        (format #t "~2a ~60a ~5a ~60a\n"
-                (car rem)
-                (reverse left-stack)
-                value
-                right-stack))
+      (unless (null? args)
+        (when (car args)
+          (format #t "~2a ~60a ~5a ~60a\n"
+                  (car rem)
+                  (reverse left-stack)
+                  value
+                  right-stack)))
       (let ((object (car rem)))
         (let ((rem (cdr rem))
               (jumpbacks jumpbacks)
