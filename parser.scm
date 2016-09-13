@@ -1,3 +1,16 @@
+; car with fallback 0
+(define (stack-take stack)
+  (if (null? stack)
+    0
+    (car stack)))
+
+; cdr with fallback '()
+(define (stack-rest stack)
+  (if (null? stack)
+    '()
+    (cdr stack)))
+
+
 ; code-list is the brainfuck code as a list of characters
 ; put anything in args to enable debug output
 (define (parse code-list . args)
@@ -19,11 +32,11 @@
             ((#\+) (set! value (1+ value)))
             ((#\-) (set! value (1- value)))
             ((#\<) (set! right-stack (cons value right-stack))
-                   (set! value (car left-stack))
-                   (set! left-stack (cdr left-stack)))
+                   (set! value (stack-take left-stack))
+                   (set! left-stack (stack-rest left-stack)))
             ((#\>) (set! left-stack (cons value left-stack))
-                   (set! value (car right-stack))
-                   (set! right-stack (cdr right-stack)))
+                   (set! value (stack-take right-stack))
+                   (set! right-stack (stack-rest right-stack)))
             ((#\.) (display (integer->char value)))
             ((#\,) (set! value (read-char)))
             ((#\[) (let ((items (call/cc
@@ -41,6 +54,6 @@
                                             right-stack))
                      (set! jumpbacks (cdr jumpbacks)))))
           (inner rem jumpbacks left-stack value right-stack)))))
-  (inner code-list '() (make-list 20 0) 0 (make-list 20 0)))
+  (inner code-list '() '() 0 '()))
 
 
