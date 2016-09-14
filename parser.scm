@@ -23,7 +23,7 @@
     (unless (null? rem)
       (unless (null? args)
         (when (car args)
-          (format #t "~2a ~60a ~5a ~60a\n"
+          (format #t "~2a ~37a ~4a ~37a\n"
                   (car rem)
                   (reverse left-stack)
                   value
