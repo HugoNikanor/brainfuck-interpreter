@@ -15,6 +15,36 @@
     '()
     (cdr stack)))
 
+(define (eat-rem rem)
+  (let inner ((rem rem)
+              (depth 0))
+    (if (eqv? (car rem) #\])
+      (if (zero? depth)
+        (cdr rem)
+        (inner (cdr rem) (1- depth)))
+      (inner (cdr rem)
+             ((if (eqv? (car rem) #\[)
+                1+
+                +)
+              depth)))))
+
+; returns a function which takes the same number of argumentns
+;   as the number of variables sent to this function
+; Then uses the input to that function to set the
+;   variables that was input to the macro
+(define-macro (set-multiple! . variables)
+  (let ((inputs (map (lambda (fun-name)
+                       (apply symbol
+                              (cons* #\i #\n #\-
+                                     (string->list
+                                       (symbol->string fun-name)))))
+                     variables)))
+    (let ((body (map (lambda (fun-name in-name)
+                       `(set! ,fun-name ,in-name))
+                     variables
+                     inputs)))
+      (display (cons* 'lambda inputs body))
+      (cons* 'lambda inputs body))))
 
 ; code-list is the brainfuck code as a list of characters
 ; an optional secound argument is a boolean if debug output should be on
@@ -47,31 +77,20 @@
             ((#\,) (set! value (read-char)))
             ((#\[) (if (zero? value)
                      ;; Remove items until matching end bracket is found
-                     (set! rem
-                       (let eat-rem ((rem rem)
-                                     (depth 0))
-                         (if (eqv? (car rem) #\])
-                           (if (zero? depth)
-                             (cdr rem)
-                             (eat-rem (cdr rem) (1- depth)))
-                           (eat-rem (cdr rem)
-                                    ((if (eqv? (car rem) #\[)
-                                       1+
-                                       +)
-                                     depth)))))
-                     (let ((items (call/cc
-                                    (lambda (cont)
-                                      (set! jumpbacks (cons cont jumpbacks))
-                                      (cont (list value
-                                                  left-stack
-                                                  right-stack))))))
-                       (set! value (car items))
-                       (set! left-stack (cadr items))
-                       (set! right-stack (caddr items)))))
+                     (set! rem (eat-rem rem))
+                     (call-with-values
+                       (lambda ()
+                         (call/cc
+                           (lambda (cont)
+                             (set! jumpbacks (cons cont jumpbacks))
+                             (cont value
+                                   left-stack
+                                   right-stack))))
+                       (set-multiple! value left-stack right-stack))))
             ((#\]) (if (not (zero? value))
-                     ((car jumpbacks) (list value
-                                            left-stack
-                                            right-stack))
+                     ((car jumpbacks) value
+                                      left-stack
+                                      right-stack)
                      (set! jumpbacks (cdr jumpbacks)))))
           (inner rem jumpbacks left-stack value right-stack)))))
   (inner code-list '() '() 0 '()))
