@@ -4,7 +4,7 @@ It currently depends slightly on Guiles module system, but that should
 be possible to write out without to much trouble.
 
 ## Usage
-	./bf < file.bf
+	./main.scm file.bf
 
 ## Issues
 
