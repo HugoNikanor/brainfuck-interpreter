@@ -40,7 +40,6 @@
                        `(set! ,fun-name ,in-name))
                      variables
                      inputs)))
-      (display (cons* 'lambda inputs body))
       (cons* 'lambda inputs body))))
 
 ; code-list is the brainfuck code as a list of characters
