@@ -34,10 +34,7 @@
 ;   variables that was input to the macro
 (define-macro (set-multiple! . variables)
   (let ((inputs (map (lambda (fun-name)
-                       (apply symbol
-                              (cons* #\i #\n #\-
-                                     (string->list
-                                       (symbol->string fun-name)))))
+                       (symbol-append 'in- fun-name))
                      variables)))
     (let ((body (map (lambda (fun-name in-name)
                        `(set! ,fun-name ,in-name))
